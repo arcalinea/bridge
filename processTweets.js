@@ -4,7 +4,7 @@ const path = require('path');
 var moment = require('moment');
 var prompt = require('prompt-sync')();
 
-const twitterConfig = require('./config');
+const config = require('./config');
 
 var processTweets = function(dataDir) {
     var files = fs.readdirSync(dataDir);
@@ -28,7 +28,7 @@ function getType(tweet){
 
 function isMyTweet(tweet){
     var bool = false;
-    if(!tweet['retweeted_status'] && tweet['in_reply_to_screen_name'] == twitterConfig.screen_name){
+    if(!tweet['retweeted_status'] && tweet['in_reply_to_screen_name'] == config.twitter.screen_name){
         if (tweet['text'].slice(0, 1) != '@') {
             bool = true;
         }
@@ -39,8 +39,8 @@ function isMyTweet(tweet){
 }
 
 function getFilesToAdd(files){
-    var from = twitterConfig.from;
-    var to = twitterConfig.to;
+    var from = config.twitter.from;
+    var to = config.twitter.to;
     filesToBeAdded = []
     for (i in files){
         var file = files[i];
@@ -67,17 +67,17 @@ function getTweetsToAdd(files){
     var tweetsToBeAdded = [];
     for (index = 0; index < files.length; ++index) {
             // parse each tweet file
-            var filePath = path.join( twitterConfig.data_dir, files[index] );
+            var filePath = path.join( config.twitter.data_dir, files[index] );
             var tweetJSON = parseTweets(filePath);
-            var tTime = moment('1999-03-28', "YYYY-MM-DDTH:mm:ss");
+            // var tTime = moment('1999-03-28', "YYYY-MM-DDTH:mm:ss");
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
                 var tweetTime = moment(Date.parse(tweet['created_at']));
-                console.log(tweetTime)
-                var from = moment(twitterConfig.from.join('-'), "YYYY-MM-DD");
-                var to = moment(twitterConfig.to.join('-'), "YYYY-MM-DD");
+                // console.log(tweetTime)
+                var from = moment(config.twitter.from.join('-'), "YYYY-MM-DD");
+                var to = moment(config.twitter.to.join('-'), "YYYY-MM-DD");
                 if (tweetTime > from && tweetTime < to){
-                    var linkStr = "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'];
+                    var linkStr = "https://twitter.com/" + config.twitter.screen_name + "/status/" + tweet['id_str'];
                     var tweetObj = {
                         'text': tweet['text'],
                         'link': linkStr,
@@ -85,13 +85,13 @@ function getTweetsToAdd(files){
                     };
                     switch(getType(tweet)){
                         case 'retweet':
-                            if(twitterConfig.retweets){
+                            if(config.twitter.retweets){
                                 tweetObj['type'] = "retweet";
                                 tweetsToBeAdded.push(tweetObj);
                             }
                             break;
                         case 'reply':
-                            if(twitterConfig.replies){
+                            if(config.twitter.replies){
                                 tweetObj['type'] = "reply";
                                 tweetObj['response_to'] = "https://twitter.com/" + tweet['in_reply_to_screen_name'] + "/status/" + tweet['in_reply_to_status_id_str'];
                                 tweetsToBeAdded.push(tweetObj);

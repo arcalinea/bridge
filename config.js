@@ -9,4 +9,15 @@ const twitterConfig = {
     dry_run: true
 };
 
-module.exports = twitterConfig;
+const facebookConfig = {
+    username: 'Jay Graber',
+    data_dir: '/home/jay/code/social-networks/data/facebook/posts',
+    from: ['2015', '04', '01'],
+    to: ['2018', '05', '01'],
+    dry_run: true
+};
+
+module.exports = {
+    'twitter': twitterConfig,
+    'facebook': facebookConfig
+}
