@@ -10,18 +10,20 @@ var processTweets = function(dataDir) {
     var files = fs.readdirSync(dataDir);
     var filesToBeAdded = getFilesToAdd(files);
     var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
-    var previewedTweets = previewTweets(tweetsToBeAdded);
-    var tweets = orderTweetsByTime(previewedTweets);
-    return tweets
+    var tweets = orderTweetsByTime(tweetsToBeAdded);
+    return tweets;
 };
 
 module.exports = processTweets;
 
-function isRetweet(tweet){
-    if(tweet['retweeted_status']){
-        return true;
+function getType(tweet){
+    if (tweet['retweeted_status']){
+        return 'retweet';
+    } else if (tweet['in_reply_to_status_id']){
+        return 'reply';
+    } else if (isMyTweet(tweet)){
+        return 'original';
     }
-    return false;
 }
 
 function isMyTweet(tweet){
@@ -62,82 +64,54 @@ function parseTweets(filePath){
 }
 
 function getTweetsToAdd(files){
-    var tweetsToBeAdded = {};
-    var counter = 0;
+    var tweetsToBeAdded = [];
     for (index = 0; index < files.length; ++index) {
             // parse each tweet file
             var filePath = path.join( twitterConfig.data_dir, files[index] );
             var tweetJSON = parseTweets(filePath);
-            var tTime = moment('1999-03-28', "YYYY-MM-DD");
+            var tTime = moment('1999-03-28', "YYYY-MM-DDTH:mm:ss");
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
                 var tweetTime = moment(Date.parse(tweet['created_at']));
+                console.log(tweetTime)
                 var from = moment(twitterConfig.from.join('-'), "YYYY-MM-DD");
                 var to = moment(twitterConfig.to.join('-'), "YYYY-MM-DD");
                 if (tweetTime > from && tweetTime < to){
-                    var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
+                    var linkStr = "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'];
                     var tweetObj = {
-                        'text': tweetStr,
+                        'text': tweet['text'],
+                        'link': linkStr,
                         'created_at': tweet['created_at']
                     };
-                    if(twitterConfig.retweets){
-                        if (isRetweet(tweet)) {
-                            tweetObj['type'] = "retweet";
-                            tweetsToBeAdded[counter] = tweetObj;
-                            counter += 1;
-                        }
-                    }
-                    // Include my own tweets, regardless of config 
-                    if (isMyTweet(tweet)){
-                        tweetObj['type'] = "my tweet";
-                        tweetsToBeAdded[counter] = tweetObj;
-                        counter += 1;
+                    switch(getType(tweet)){
+                        case 'retweet':
+                            if(twitterConfig.retweets){
+                                tweetObj['type'] = "retweet";
+                                tweetsToBeAdded.push(tweetObj);
+                            }
+                            break;
+                        case 'reply':
+                            if(twitterConfig.replies){
+                                tweetObj['type'] = "reply";
+                                tweetObj['response_to'] = "https://twitter.com/" + tweet['in_reply_to_screen_name'] + "/status/" + tweet['in_reply_to_status_id_str'];
+                                tweetsToBeAdded.push(tweetObj);
+                            }
+                            break;
+                        case 'original':
+                            tweetObj['type'] = "my tweet";
+                            tweetsToBeAdded.push(tweetObj);
+                            break;
                     }
                 }
             }
         }
-    return tweetsToBeAdded
+    return tweetsToBeAdded;
 }
-
-var previewTweets = function preview(tweets){
-    console.log("\nPreview tweets:\n", tweets)
-    var discard = prompt("To confirm, respond 'y'. To cancel, respond 'n' or 'c'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
-    console.log(discard);
-    if (discard == 'y') {
-        return tweets
-    } else if (discard == 'n' || discard == 'c'){
-        process.exit( 0 );
-    }
-    var strs = discard.split(',');
-    var discarded = [];
-    for (d in strs) {
-        discarded.push(parseInt(strs[d]));
-    }
-    console.log("Discarded", discarded);
-    for (var key in tweets) {
-        if (discarded.includes(parseInt(key))){
-            delete tweets[key];
-        }
-    }
-    console.log("Tweets to be added after edits:", tweets);
-    var confirm = prompt("To add the tweets above, respond 'y'. To remove more tweets, respond 'n'. To cancel, respond 'c'. => ")
-    if (confirm == 'y'){
-        return tweets
-    } else if (confirm == 'n') {
-        return preview(tweets);
-    } else {
-        console.log("Please respond with 'y', 'n', or 'c'")
-        process.exit( 0 );
-    }
-}
+  
 
 function orderTweetsByTime(tweets){
-    var ordered = [];
-    for (var index in tweets) {
-        ordered.push(tweets[index]);
-    }
-    ordered.sort(function(a, b) {
+    tweets.sort(function(a, b) {
         return Date.parse(a.created_at) - Date.parse(b.created_at);
     });
-    return ordered;
+    return tweets;
 }
