@@ -6,7 +6,6 @@ const processFbkPosts = require('./processFbkPosts');
 const config = require('./config');
 
 
-
 // Pull in social media data, feed into common data format. 
 // 	- Nice way is OAuth and an easy UI for import, hacky way is user-requested data dump. 
 // Data format MVP is simply using key/value store
@@ -22,6 +21,7 @@ const config = require('./config');
 // Response_To
 // Signature
 
+// Smor = social media object representation
 // function Smor(type){
 //     this.type = type;
 //     this.source = "";

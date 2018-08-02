@@ -8,7 +8,6 @@ const config = require('./config');
 
 var processPosts = function(dataDir) {
     var postsToBeAdded = getPostsToAdd(path.join(config.facebook.data_dir, 'your_posts.json'));
-    // var posts = orderPostsByTime(postsToBeAdded);
     return postsToBeAdded;
 };
 
@@ -29,9 +28,6 @@ function getPostsToAdd(filePath){
         var from = moment(config.facebook.from.join('-'), "YYYY-MM-DD");
         var to = moment(config.facebook.to.join('-'), "YYYY-MM-DD");
         if (postTime > from && postTime < to){
-            // console.log("\npost in timeframe", post)
-            // console.log("DATA", post.data)
-            // console.log("TITLE", post.title)
             switch(getType(post)){
                 case 'original': 
                     // console.log("Original post:", post)
