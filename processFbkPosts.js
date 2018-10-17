@@ -15,7 +15,14 @@ module.exports = processPosts;
 
 function getType(post){
     if (post.title == config.facebook.username +  " shared a link." || post.title == config.facebook.username +  " shared a post."){
-        return 'original';
+        return 'myLink';
+    }
+    var re = new RegExp('^' + username + ' updated .{1,6} status.');
+    if (post.title.match(re)) {
+      return 'myStatusUpdate';
+    }
+    if (post.title.match(/.* shared a link to your timeline./)) {
+      return 'linkOnMyTL';
     }
 }
 
@@ -29,7 +36,7 @@ function getPostsToAdd(filePath){
         var to = moment(config.facebook.to.join('-'), "YYYY-MM-DD");
         if (postTime > from && postTime < to){
             switch(getType(post)){
-                case 'original': 
+                case 'myLink': 
                     // console.log("Original post:", post)
                     if (post['data']){
                         var postObj = {
@@ -38,6 +45,27 @@ function getPostsToAdd(filePath){
                         }
                         posts.push(postObj);
                         break;
+                    }
+                case 'myStatusUpdate':
+                    if (post['data']){
+                      var postObj = {
+                        'text': post['data'][0]['post'],
+                        'created_at': post['timestamp']
+                      }
+                      posts.push(postObj);
+                      break;
+                    }
+                case 'linkOnMyTL':
+                    if (post['data']){
+                      // get author info
+                      var author = post['title'].match(/^(.*) shared/)[1];
+                      var postObj = {
+                        'text': post['data'][0]['post'],
+                        'created_at': post['timestamp'],
+                        'author': author
+                      }
+                      posts.push(postObj);
+                      break;
                     }
             }
         }
