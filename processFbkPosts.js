@@ -37,7 +37,6 @@ function getPostsToAdd(filePath){
         if (postTime > from && postTime < to){
             switch(getType(post)){
                 case 'myLink': 
-                    // console.log("Original post:", post)
                     if (post['data']){
                         var postObj = {
                             'text': post['data'][0]['post'],
