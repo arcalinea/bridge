@@ -73,7 +73,6 @@ function getTweetsToAdd(files){
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
                 var tweetTime = moment(Date.parse(tweet['created_at']));
-                // console.log(tweetTime)
                 var from = moment(config.twitter.from.join('-'), "YYYY-MM-DD");
                 var to = moment(config.twitter.to.join('-'), "YYYY-MM-DD");
                 if (tweetTime > from && tweetTime < to){
