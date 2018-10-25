@@ -4,7 +4,8 @@ const path = require('path');
 var moment = require('moment');
 var prompt = require('prompt-sync')();
 
-const config = require('./config');
+const config = require('../config');
+
 
 var processTweets = function(dataDir) {
     var files = fs.readdirSync(dataDir);

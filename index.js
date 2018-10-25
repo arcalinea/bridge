@@ -1,8 +1,8 @@
 const fs = require('fs');
 const moment = require('moment');
 
-const processTweets = require('./processTweets');
-const processFbkPosts = require('./processFbkPosts');
+const processTweets = require('./extensions/twitter');
+const processFbkPosts = require('./extensions/facebook');
 const config = require('./config');
 
 

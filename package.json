@@ -1,7 +1,7 @@
 {
   "name": "bridge",
   "version": "1.0.0",
-  "description": "common format for social media data, dweb compatible",
+  "description": "social media data format portability extensions",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

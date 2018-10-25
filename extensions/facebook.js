@@ -4,7 +4,10 @@ const path = require('path');
 var moment = require('moment');
 var prompt = require('prompt-sync')();
 
-const config = require('./config');
+const config = require('../config');
+
+console.log("CONFIG in fbk", config.facebook.username)
+
 
 var processPosts = function(dataDir) {
     var postsToBeAdded = getPostsToAdd(path.join(config.facebook.data_dir, 'your_posts.json'));
@@ -17,12 +20,15 @@ function getType(post){
     if (post.title == config.facebook.username +  " shared a link." || post.title == config.facebook.username +  " shared a post."){
         return 'myLink';
     }
-    var re = new RegExp('^' + username + ' updated .{1,6} status.');
-    if (post.title.match(re)) {
-      return 'myStatusUpdate';
-    }
-    if (post.title.match(/.* shared a link to your timeline./)) {
-      return 'linkOnMyTL';
+    var re = new RegExp('^' + config.facebook.username + ' updated .{1,6} status.');
+    console.log(re, post.title)
+    if (post.title){
+      if (post.title.match(re)) {
+        return 'myStatusUpdate';
+      }
+      if (post.title.match(/.* shared a link to your timeline./)) {
+        return 'linkOnMyTL';
+      }
     }
 }
 
