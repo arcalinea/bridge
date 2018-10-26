@@ -1,12 +1,10 @@
-const fs = require('fs');
-const moment = require('moment');
+const config = require('./config');
+const utils = require('./utils');
 
-// const processTweets = require('./extensions/twitter');
 const twitterAdaptor = require('./extensions/twitter');
 const ssbAdaptor = require('./extensions/ssb');
 const facebookAdaptor = require('./extensions/facebook');
 
-const config = require('./config');
 
 // Pull in social media data, feed into common data format. 
 //  1. From user-requested data dump
@@ -20,24 +18,6 @@ const config = require('./config');
 // Data
 // Response_To
 // Signature
-
-// function Smor(type){
-//     this.type = type;
-//     this.source = "";
-//     this.author = "";
-//     this.created_at = "";
-//     this.data = {};
-//     this.response_to = "";
-//     this.signature = "";
-// }
-
-function createDataFile(smors){
-    fs.writeFile("data.json", JSON.stringify(smors), function(err) {
-        if(err) {
-            return console.log(err);
-        }
-    });
-}
 
 // Get raw tweets
 var tweets = twitterAdaptor.readFromDataDir(config.twitter.data_dir);
@@ -57,7 +37,7 @@ console.log("fbkPosts", fbkPosts)
 var fbkSmors = facebookAdaptor.toSmors(fbkPosts);
 console.log("fbkSmors", fbkSmors)
 
-// var allSmors = smorsT.concat(smorsF);
-// console.log("Posts", allSmors)
-// createDataFile(allSmors);
+var allSmors = smors.concat(fbkSmors);
+console.log("Posts", allSmors)
+utils.createDataFile(allSmors);
 
