@@ -1,9 +1,6 @@
 
-
 var ssbAdaptor = exports;
 ssbAdaptor.smorsToSsb = smorsToSsb;
-
-// {type: "post", text: tweets[i]['text']}
 
 function smorsToSsb(posts) {
   var ssb_posts = [];
