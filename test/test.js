@@ -19,7 +19,7 @@ const ssbAdaptor = require('../extensions/ssb');
 // Signature
 
 // Get raw tweets
-var tweets = twitterAdaptor.readFromDataDir(config.twitter.data_dir);
+var tweets = twitterAdaptor.readFromDataDir('./test/data');
 console.log("Tweets", tweets);
 // convert raw tweets to smors
 var smors = twitterAdaptor.toSmors(tweets);
@@ -28,7 +28,7 @@ console.log("Smors", smors);
 var ssb_posts = ssbAdaptor.smorsToSsb(smors);
 console.log("Ssb posts", ssb_posts);
 
-var ssb_posts = ssbAdaptor.smorsToSsb(twitterAdaptor.toSmors(twitterAdaptor.readFromDataDir(config.twitter.data_dir)));
+var ssb_posts = ssbAdaptor.smorsToSsb(twitterAdaptor.toSmors(twitterAdaptor.readFromDataDir('./test/data')));
 console.log("Ssb posts", ssb_posts);
 
 var fbkPosts = facebookAdaptor.readFromDataDir(config.facebook.data_dir);
