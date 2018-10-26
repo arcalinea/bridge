@@ -6,15 +6,28 @@ var prompt = require('prompt-sync')();
 
 const config = require('../config');
 
-console.log("CONFIG in fbk", config.facebook.username)
+var facebookAdaptor = exports;
+facebookAdaptor.readFromDataDir = readFromDataDir;
+facebookAdaptor.toSmors = toSmors;
 
-
-var processPosts = function(dataDir) {
+function readFromDataDir(dataDir) {
     var postsToBeAdded = getPostsToAdd(path.join(config.facebook.data_dir, 'your_posts.json'));
     return postsToBeAdded;
 };
 
-module.exports = processPosts;
+function toSmors(posts){
+    var smors = [];
+    for (var i in posts){
+        var smor = {};
+        smor['type'] = "facebook_post";
+        smor['created_at'] = posts[i]['timestamp'];
+        smor['data'] = {
+            "text": posts[i]['text']
+        };
+        smors.push(smor);
+    }
+    return smors;
+}
 
 function getType(post){
     if (post.title == config.facebook.username +  " shared a link." || post.title == config.facebook.username +  " shared a post."){

@@ -6,8 +6,11 @@ var prompt = require('prompt-sync')();
 
 const config = require('../config');
 
+var twitterAdaptor = exports;
+twitterAdaptor.readFromDataDir = readFromDataDir;
+twitterAdaptor.toSmors = toSmors;
 
-var processTweets = function(dataDir) {
+function readFromDataDir(dataDir) {
     var files = fs.readdirSync(dataDir);
     var filesToBeAdded = getFilesToAdd(files);
     var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
@@ -15,7 +18,27 @@ var processTweets = function(dataDir) {
     return tweets;
 };
 
-module.exports = processTweets;
+
+function toSmors(tweets) {
+  var smors = [];
+  for (var i in tweets){
+      // var s = new Smor("tweet");
+      var smor = {};
+      smor['type'] = "tweet"
+      smor['source'] = "twitter(" + tweets[i]['link'] + ")";
+      smor['author'] = ''
+      smor['created_at'] = moment(Date.parse(tweets[i]["created_at"])).unix();
+      smor['data'] = {
+          "text": tweets[i]["text"]
+      }
+      smor['signature '] = ''
+      if(tweets[i]['response_to']){
+          smor['response_to'] = srcTwitter(tweets[i]['response_to']);
+      }
+      smors.push(smor);
+  }
+  return smors;
+}
 
 function getType(tweet){
     if (tweet['retweeted_status']){
@@ -74,6 +97,7 @@ function getTweetsToAdd(files){
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
                 var tweetTime = moment(Date.parse(tweet['created_at']));
+                // console.log(tweetTime)
                 var from = moment(config.twitter.from.join('-'), "YYYY-MM-DD");
                 var to = moment(config.twitter.to.join('-'), "YYYY-MM-DD");
                 if (tweetTime > from && tweetTime < to){
