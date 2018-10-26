@@ -4,7 +4,7 @@
   "description": "social media data format portability extensions",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node ./test/test.js"
   },
   "author": "arcalinea",
   "license": "ISC",
